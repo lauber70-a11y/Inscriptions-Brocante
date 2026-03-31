@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Inscriptions - Brocante</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #18bc9c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --pro: #9b59b6;
+            --email-color: #2980b9;
+            --email-done: #2ecc71;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .header-app {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--light);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+        }
+        .header-app h1 { margin: 0; color: var(--primary); }
+        .header-droite {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .archive-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--light);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        h2 { color: var(--primary); text-align: center; margin-bottom: 5px; }
+        
+        .config-bar {
+            background: #dfe6e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .config-bar label { font-weight: bold; }
+        .config-bar input { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .jauge-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+        .jauge-barre {
+            height: 20px;
+            width: 0%;
+            background-color: var(--secondary);
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            transition: width 0.4s ease, background-color 0.3s;
+        }
+        .jauge-barre.alerte { background-color: var(--danger); }
+
+        form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            height: 100%;
+            margin-top: 5px;
+        }
+        .radio-group label {
+            font-weight: normal;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        label { margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        
+        .actions-globales { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        
+        .btn-modern {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            font-size: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-modern svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-print { background-color: #8e44ad; }
+        .btn-print:hover { background-color: #732d91; }
+        
+        .btn-tags { background-color: #e67e22; }
+        .btn-tags:hover { background-color: #d35400; }
+
+        .btn-danger-global { background-color: var(--danger); }
+        .btn-danger-global:hover { background-color: #c0392b; }
+        
+        .btn-rappel-group { background-color: #d35400; }
+        .btn-rappel-group:hover { background-color: #b33900; }
+
+        .btn-fiches-all { background-color: #16a085; }
+        .btn-fiches-all:hover { background-color: #117a65; }
+        
+        .table-container { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: var(--primary); color: white; white-space: nowrap; }
+        tr:hover { background-color: #f1f2f6; }
+        
+        .actions { display: flex; gap: 3px; }
+        
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .btn-action svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn-action:hover { transform: scale(1.1); }
+        
+        .btn-status { background-color: var(--primary); }
+        .btn-status:hover { background-color: #1a252f; }
+        
+        .btn-edit { background-color: var(--info); }
+        .btn-edit:hover { background-color: #2980b9; }
+        
+        .btn-email { background-color: var(--email-color); }
+        .btn-email:hover { background-color: #1c638d; }
+        .btn-email.envoye { background-color: var(--email-done); }
+        .btn-email.envoye:hover { background-color: #27ae60; }
+        
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: #c0392b; }
+        
+        .btn-fiche { background-color: #16a085; }
+        .btn-fiche:hover { background-color: #117a65; }
+        
+        .status-badge { padding: 4px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; color: white; white-space: nowrap; }
+        .status-paye { background-color: var(--secondary); }
+        .status-attente { background-color: var(--warning); }
+        .type-badge { padding: 4px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; color: white; white-space: nowrap; }
+        .type-particulier { background-color: #7f8c8d; }
+        .type-pro { background-color: var(--pro); }
+
+        #groupe-siret { display: none; }
+        
+        #titre-impression { display: none; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 10px; }
+        #visa-mairie-impression { display: none; text-align: right; font-weight: bold; font-size: 12px; margin-top: 15px; }
+
+        #zone-etiquettes, #zone-fiche-individuelle { display: none; }
+
+        .ligne-paye { background-color: transparent; }
+        .ligne-attente { background-color: #fcf3cf; }
+
+        @media print {
+            @page { size: landscape; margin: 0.5cm; }
+            html, body { background-color: white; color: black; padding: 0; overflow: visible !important; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; }
+            .config-bar, .stats, .jauge-container, h2#titre-formulaire, form, .search-area, .actions-globales, .actions, .header-app { display: none !important; }
+            
+            #titre-impression { display: block; }
+            #visa-mairie-impression { display: block; }
+            
+            .table-container { overflow: visible !important; overflow-x: visible !important; }
+            table { font-size: 8px; width: 100%; border-collapse: collapse; table-layout: fixed; }
+            th, td { padding: 4px; border: 1px solid #000 !important; overflow: hidden; }
+            th { background-color: #eee !important; color: black !important; }
+            
+            th:nth-child(1), td:nth-child(1) { width: 30px !important; text-align: center !important; }
+            th:nth-child(2), td:nth-child(2) { width: 30px !important; text-align: center !important; }
+            th:nth-child(3), td:nth-child(3) { width: 110px; }
+            th:nth-child(4), td:nth-child(4) { width: 75px; }
+            th:nth-child(5), td:nth-child(5) { width: 70px; }
+            th:nth-child(6), td:nth-child(6) { width: 90px; }
+            th:nth-child(7), td:nth-child(7) { width: 95px; }
+            
+            th:nth-child(8), td:nth-child(8) { width: 210px !important; }
+            
+            th:nth-child(10), td:nth-child(10) { width: 40px; text-align: center; }
+            th:nth-child(11), td:nth-child(11) { width: 45px; text-align: center; }
+            
+            th:nth-child(9), td:nth-child(9), th:nth-child(12), td:nth-child(12) { display: none !important; }
+            
+            .ligne-attente { background-color: #e2e2e2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .status-badge, .type-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; border: none !important; color: black !important; background-color: transparent !important; font-size: 8px !important; padding: 0 !important; }
+            
+            body.mode-etiquettes #titre-impression, body.mode-etiquettes #visa-mairie-impression, body.mode-etiquettes .table-container { display: none !important; }
+            body.mode-etiquettes #zone-etiquettes { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+            body.mode-etiquettes .etiquette { border: 1px solid #000 !important; page-break-inside: avoid; height: 3.5cm; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+            body.mode-etiquettes .etiquette-num { font-size: 28px; font-weight: bold; margin-bottom: 5px; }
+            body.mode-etiquettes .etiquette-nom { font-size: 16px; font-weight: 600; }
+            
+            body.mode-fiche { @page { size: portrait; margin: 1cm; } }
+            body.mode-fiche #titre-impression, body.mode-fiche #visa-mairie-impression, body.mode-fiche .table-container { display: none !important; }
+            body.mode-fiche #zone-fiche-individuelle { display: block !important; }
+            
+            .fiche-a4 { 
+                font-size: 13px;
+                line-height: 1.4; 
+                page-break-after: always; 
+                height: 94vh; 
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between; 
+                box-sizing: border-box;
+            }
+            .fiche-a4:last-child { page-break-after: auto; }
+            
+            .fiche-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px; }
+            .fiche-header h2 { font-size: 17px; margin: 2px 0; font-weight: bold; }
+            .fiche-header h3 { font-size: 14px; margin: 2px 0; }
+            
+            .fiche-cadre { border: 1px solid #000; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+            .fiche-titre-cadre { font-weight: bold; text-transform: uppercase; margin-bottom: 5px; text-decoration: underline; font-size: 13px; }
+            
+            .fiche-signature { display: flex; justify-content: space-between; margin-top: 20px; }
+            .fiche-zone-sign { border: 1px dashed #000; width: 180px; height: 80px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-app">
+        <h1>🎪 Gestion des Inscriptions - Brocante</h1>
+        <div class="header-droite">
+            <div class="archive-selector">
+                <label for="select-annee">📂 Année consultée :</label>
+                <select id="select-annee" onchange="changerAnneeConsultation()" style="padding: 5px; font-weight: bold;">
+                </select>
+            </div>
+            <button class="btn-modern btn-danger-global" onclick="reinitialiserAnneeEnCours()">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Réinitialiser l'année
+            </button>
+        </div>
+    </div>
+    
+    <div id="titre-impression">Comité des Fêtes de Montbozon - Registre des exposants - Brocante du <span id="print-date">...</span></div>
+    
+    <div class="config-bar">
+        <div>
+            <label for="date-brocante">Date de la brocante :</label>
+            <input type="date" id="date-brocante" oninput="sauvegarderDateBrocante()">
+        </div>
+        <div>
+            <label for="capacite-totale">Capacité totale :</label>
+            <input type="number" id="capacite-totale" min="1" value="500" style="width: 80px;" oninput="sauvegarderCapacite()">
+            <span>m (2€ / m)</span>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div>Total Exposants : <span id="stat-total">0</span></div>
+        <div>Mètres réservés : <span id="stat-metres">0</span> m</div>
+        <div>Mètres restants : <span id="stat-restants">0</span> m</div>
+        <div>Total collecté : <span id="stat-caisse">0</span> €</div>
+    </div>
+
+    <div class="jauge-container">
+        <div id="jauge" class="jauge-barre">0%</div>
+    </div>
+
+    <h2 id="titre-formulaire">Ajouter un Exposant</h2>
+    <form id="form-inscription">
+        <input type="hidden" id="edit-id" value="">
+
+        <div class="form-group">
+            <label>Type d'exposant</label>
+            <div class="radio-group">
+                <label><input type="radio" name="typeExposant" value="Particulier" checked onchange="toggleSiret()"> Particulier</label>
+                <label><input type="radio" name="typeExposant" value="Professionnel" onchange="toggleSiret()"> Professionnel</label>
+            </div>
+        </div>
+
+        <div class="form-group" id="groupe-siret">
+            <label for="siret">N° SIRET</label>
+            <input type="text" id="siret" placeholder="Ex: 123 456 789 00012">
+        </div>
+
+        <div class="form-group">
+            <label for="nom">Nom / Prénom (ou Raison Soc.)</label>
+            <input type="text" id="nom" placeholder="Ex: Jean Dupont" required>
+        </div>
+        <div class="form-group">
+            <label for="telephone">N° de Téléphone</label>
+            <input type="tel" id="telephone" placeholder="Ex: 06 12 34 56 78">
+        </div>
+        <div class="form-group">
+            <label for="email">Adresse Mail</label>
+            <input type="email" id="email" placeholder="Ex: jean.dupont@email.com">
+        </div>
+        <div class="form-group">
+            <label for="cni">N° Pièce d'Identité (CNI / Pass.)</label>
+            <input type="text" id="cni" placeholder="Ex: 150499...">
+        </div>
+        <div class="form-group">
+            <label for="dateCni">Date de délivrance</label>
+            <input type="date" id="dateCni">
+        </div>
+        <div class="form-group">
+            <label for="autoriteCni">Délivrée par</label>
+            <input type="text" id="autoriteCni" placeholder="Ex: Mairie de Paris">
+        </div>
+        <div class="form-group full-width">
+            <label for="adresse">Adresse Postale complète</label>
+            <input type="text" id="adresse" placeholder="Ex: 12 rue des Fleurs, 75000 Paris">
+        </div>
+        <div class="form-group">
+            <label for="emplacement">N° Emplacement</label>
+            <input type="text" id="emplacement" placeholder="Ex: A12">
+        </div>
+        <div class="form-group">
+            <label for="metres">Métrage (m)</label>
+            <input type="number" id="metres" min="1" placeholder="Ex: 3">
+        </div>
+        <div class="form-group">
+            <label for="statut">Statut</label>
+            <select id="statut">
+                <option value="Payé">Payé</option>
+                <option value="En attente">En attente</option>
+            </select>
+        </div>
+        <div class="form-group" style="justify-content: flex-end; align-items: flex-end;">
+            <button type="submit" id="btn-soumettre" class="btn-modern" style="background-color: var(--secondary);">
+                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                <span id="texte-bouton">Inscrire l'exposant</span>
+            </button>
+        </div>
+    </form>
+
+    <div class="search-area" style="display: flex; gap: 10px; margin: 20px 0 10px 0; flex-wrap: wrap;">
+        <input type="text" id="recherche" style="flex: 1; min-width: 250px; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px;" placeholder="Rechercher par nom, emplacement, téléphone..." oninput="afficherInscriptions()">
+        
+        <select id="filtre-type" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
+            <option value="tous">Tous les types</option>
+            <option value="Particulier">Particuliers</option>
+            <option value="Professionnel">Professionnels</option>
+        </select>
+
+        <select id="filtre-statut" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
+            <option value="tous">Tous les paiements</option>
+            <option value="Payé">Payés</option>
+            <option value="En attente">En attente</option>
+        </select>
+
+        <select id="filtre-email" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
+            <option value="tous">Tous les e-mails</option>
+            <option value="envoye">E-mails envoyés</option>
+            <option value="non-envoye">À envoyer</option>
+        </select>
+    </div>
+
+    <div class="actions-globales">
+        <button class="btn-modern btn-rappel-group" onclick="envoyerEmailRappelGroupe()">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Relancer les impayés (Email)
+        </button>
+
+        <button class="btn-modern btn-fiches-all" onclick="imprimerToutesLesFiches()">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Imprimer toutes les fiches (A4)
+        </button>
+
+        <button class="btn-modern btn-tags" onclick="imprimerEtiquettes()">
+            <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+            Imprimer les Étiquettes
+        </button>
+        
+        <button class="btn-modern btn-print" onclick="window.print()">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Imprimer la liste filtrée
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Empl.</th>
+                    <th>Type</th>
+                    <th>Nom / Raison Soc.</th>
+                    <th>Téléphone</th>
+                    <th>N° CNI</th>
+                    <th>Délivrance CNI</th>
+                    <th>SIRET</th>
+                    <th>Adresse</th>
+                    <th>Métrage</th>
+                    <th>Total dû</th>
+                    <th>Statut</th>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="liste-corps"></tbody>
+        </table>
+    </div>
+
+    <div id="visa-mairie-impression">Visa mairie : ____________________</div>
+
+    <div id="zone-etiquettes"></div>
+    <div id="zone-fiche-individuelle"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+<script>
+    const PRIX_AU_METRE = 2; 
+    const anneeActuelle = new Date().getFullYear().toString();
+    
+    // ==========================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDk6OPQe7XS5hdtNfJHOriTc00_RWCI4A4",
+        authDomain: "inscription-brocante.firebaseapp.com",
+        databaseURL: "https://inscription-brocante-default-rtdb.europe-west1.firebasedatabase.app/", // <-- AJOUTEZ VOTRE LIEN ICI
+        projectId: "inscription-brocante",
+        storageBucket: "inscription-brocante.firebasestorage.app",
+        messagingSenderId: "836597625276",
+        appId: "1:836597625276:web:432d6eaada859773f5bbb9"
+    };
+    // ==========================================================
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database(); // <-- Maintenant on pointe sur la base Realtime
+
+    let inscriptions = [];
+    let capaciteTotale = 500;
+    let dateBrocante = '';
+    let anneeSelectionnee = localStorage.getItem('brocanteAnneeConsultation') || anneeActuelle;
+
+    function initialiserSelecteurAnnee() {
+        const select = document.getElementById('select-annee');
+        select.innerHTML = '';
+        
+        db.ref("config").once("value", (snapshot) => {
+            let anneesDispo = [anneeActuelle];
+            if (snapshot.exists()) {
+                snapshot.forEach((child) => {
+                    if (!anneesDispo.includes(child.key)) anneesDispo.push(child.key);
+                });
+            }
+            anneesDispo.sort().reverse();
+            anneesDispo.forEach(ann => {
+                const option = document.createElement('option');
+                option.value = ann;
+                option.text = ann;
+                if (ann === anneeSelectionnee) option.selected = true;
+                select.appendChild(option);
+            });
+        });
+    }
+
+    function chargerAnnee(annee) {
+        // Déconnexion des écouteurs précédents
+        db.ref("config/" + anneeSelectionnee).off();
+        db.ref("annees/" + anneeSelectionnee + "/exposants").off();
+
+        db.ref("config/" + annee).on("value", (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                capaciteTotale = data.capacite || 500;
+                dateBrocante = data.date || '';
+            } else {
+                db.ref("config/" + annee).set({ capacite: 500, date: '' });
+                capaciteTotale = 500;
+                dateBrocante = '';
+            }
+            document.getElementById('capacite-totale').value = capaciteTotale;
+            document.getElementById('date-brocante').value = dateBrocante;
+            document.getElementById('print-date').innerText = dateBrocante ? formaterDate(dateBrocante) : '...';
+            afficherInscriptions();
+        });
+
+        db.ref("annees/" + annee + "/exposants").on("value", (snapshot) => {
+            inscriptions = [];
+            if (snapshot.exists()) {
+                snapshot.forEach((child) => {
+                    inscriptions.push({ id: child.key, ...child.val() });
+                });
+            }
+            afficherInscriptions();
+        });
+    }
+
+    function changerAnneeConsultation() {
+        const nouveauChoix = document.getElementById('select-annee').value;
+        localStorage.setItem('brocanteAnneeConsultation', nouveauChoix);
+        anneeSelectionnee = nouveauChoix;
+        chargerAnnee(anneeSelectionnee);
+    }
+
+    function sauvegarderCapacite() {
+        capaciteTotale = parseInt(document.getElementById('capacite-totale').value) || 0;
+        db.ref("config/" + anneeSelectionnee).update({ capacite: capaciteTotale });
+    }
+
+    function sauvegarderDateBrocante() {
+        dateBrocante = document.getElementById('date-brocante').value;
+        db.ref("config/" + anneeSelectionnee).update({ date: dateBrocante });
+    }
+
+    const form = document.getElementById('form-inscription');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const idEnCours = document.getElementById('edit-id').value;
+        const type = document.querySelector('input[name="typeExposant"]:checked').value;
+        const nom = document.getElementById('nom').value;
+        const telephone = document.getElementById('telephone').value;
+        const email = document.getElementById('email').value;
+        const cni = document.getElementById('cni').value;
+        const dateCni = document.getElementById('dateCni').value;
+        const autoriteCni = document.getElementById('autoriteCni').value;
+        const siret = document.getElementById('siret').value;
+        const adresse = document.getElementById('adresse').value;
+        const emplacement = document.getElementById('emplacement').value || '-';
+        const metres = parseInt(document.getElementById('metres').value) || 0;
+        const statut = document.getElementById('statut').value;
+        
+        if (emplacement !== '' && emplacement !== '-') {
+            const doublon = inscriptions.find(inscrit => 
+                inscrit.emplacement === emplacement && inscrit.id !== idEnCours
+            );
+            
+            if (doublon) {
+                alert(`⚠️ Impossible : L'emplacement "${emplacement}" est déjà attribué à ${doublon.nom} !`);
+                return;
+            }
+        }
+
+        const dataExposant = {
+            type, nom, telephone, email, cni, dateCni, autoriteCni, 
+            siret: (type === "Professionnel" ? siret : ''),
+            adresse, emplacement, metres, statut, prixTotal: metres * PRIX_AU_METRE
+        };
+
+        const refExposants = db.ref("annees/" + anneeSelectionnee + "/exposants");
+
+        if (idEnCours) {
+            refExposants.child(idEnCours).update(dataExposant);
+            document.getElementById('edit-id').value = '';
+            document.getElementById('titre-formulaire').innerText = "Ajouter un Exposant";
+            document.getElementById('texte-bouton').innerText = "Inscrire l'exposant";
+            document.getElementById('btn-soumettre').style.backgroundColor = 'var(--secondary)';
+        } else {
+            dataExposant.emailEnvoye = false;
+            refExposants.push(dataExposant);
+        }
+        
+        form.reset();
+        toggleSiret();
+    });
+
+    function chargerPourModification(id) {
+        const inscrit = inscriptions.find(i => i.id === id);
+        if (inscrit) {
+            document.getElementById('edit-id').value = inscrit.id;
+            const radios = document.getElementsByName("typeExposant");
+            radios.forEach(radio => radio.checked = (radio.value === inscrit.type));
+            toggleSiret();
+            
+            document.getElementById('nom').value = inscrit.nom;
+            document.getElementById('telephone').value = inscrit.telephone || '';
+            document.getElementById('email').value = inscrit.email || '';
+            document.getElementById('cni').value = inscrit.cni || '';
+            document.getElementById('dateCni').value = inscrit.dateCni || '';
+            document.getElementById('autoriteCni').value = inscrit.autoriteCni || '';
+            document.getElementById('siret').value = inscrit.siret || '';
+            document.getElementById('adresse').value = inscrit.adresse || '';
+            document.getElementById('emplacement').value = inscrit.emplacement === '-' ? '' : inscrit.emplacement;
+            document.getElementById('metres').value = inscrit.metres === 0 ? '' : inscrit.metres;
+            document.getElementById('statut').value = inscrit.statut;
+
+            document.getElementById('titre-formulaire').innerText = `Modifier l'inscription de ${inscrit.nom}`;
+            document.getElementById('texte-bouton').innerText = "Enregistrer les modifications";
+            document.getElementById('btn-soumettre').style.backgroundColor = 'var(--info)';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function supprimer(id) {
+        if(confirm("Êtes-vous sûr de vouloir supprimer cette inscription ?")) {
+            db.ref("annees/" + anneeSelectionnee + "/exposants").child(id).remove();
+        }
+    }
+
+    function changerStatut(id) {
+        const inscrit = inscriptions.find(i => i.id === id);
+        if(inscrit) {
+            const nouveauStatut = inscrit.statut === "Payé" ? "En attente" : "Payé";
+            db.ref("annees/" + anneeSelectionnee + "/exposants").child(id).update({ statut: nouveauStatut });
+        }
+    }
+
+    function envoyerEmail(id) {
+        const inscrit = inscriptions.find(i => i.id === id);
+        if (!inscrit || !inscrit.email) {
+            alert("Cet exposant n'a pas d'adresse e-mail renseignée !");
+            return;
+        }
+        const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
+        const sujet = `Confirmation d'inscription - Brocante ${anneeSelectionnee}`;
+        const corpsEmail = `Bonjour ${inscrit.nom},\n\nNous vous confirmons votre inscription pour la brocante ${labelBrocante}.\n\nVoici vos informations :\n- Emplacement : ${inscrit.emplacement}\n- Taille : ${inscrit.metres} mètre(s)\n- Statut du règlement : ${inscrit.statut}\n\nCordialement,\nLe Comité d'Organisation`;
+        const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(inscrit.email)}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsEmail)}`;
+        window.open(urlGmail, '_blank');
+        db.ref("annees/" + anneeSelectionnee + "/exposants").child(id).update({ emailEnvoye: true });
+    }
+
+    function envoyerEmailRappelGroupe() {
+        const dossiersEnAttente = inscriptions.filter(i => i.statut === "En attente" && i.email);
+        if (dossiersEnAttente.length === 0) {
+            alert("Aucun exposant en attente avec une adresse e-mail n'a été trouvé !");
+            return;
+        }
+        const listeEmails = dossiersEnAttente.map(i => i.email).join(',');
+        const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
+        const sujet = `IMPORTANT : Règlement de votre inscription - Brocante ${anneeSelectionnee}`;
+        const corpsEmail = `Bonjour,\n\nNous faisons le point sur les inscriptions pour la brocante ${labelBrocante}.\n\nSauf erreur de notre part, nous n'avons pas encore reçu votre règlement. Merci de nous le faire parvenir dans les plus brefs délais pour valider définitivement votre emplacement.\n\nCordialement,\nLe Comité d'Organisation`;
+        const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&bcc=${encodeURIComponent(listeEmails)}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsEmail)}`;
+        if(confirm(`Vous allez ouvrir Gmail pour envoyer un rappel à ${dossiersEnAttente.length} exposant(s). Continuer ?`)) {
+            window.open(urlGmail, '_blank');
+        }
+    }
+
+    function genererHTMLFiche(inscrit, datePropre) {
+        const nomMajuscule = (inscrit.nom || '').toUpperCase();
+        return `
+            <div class="fiche-a4">
+                <div class="fiche-header">
+                    <h2>FICHE RÉCAPITULATIVE DE L'EXPOSANT : ${nomMajuscule}</h2>
+                    <h3>Brocante du ${datePropre}</h3>
+                </div>
+                <div class="fiche-cadre">
+                    <div class="fiche-titre-cadre">Coordonnées de l'Exposant</div>
+                    <div><strong>Nom / Prénom :</strong> ${inscrit.nom}</div>
+                    <div><strong>Téléphone :</strong> ${inscrit.telephone || '-'}</div>
+                    <div><strong>Email :</strong> ${inscrit.email || '-'}</div>
+                    <div><strong>Adresse :</strong> ${inscrit.adresse || '-'}</div>
+                </div>
+                <div class="fiche-cadre">
+                    <div class="fiche-titre-cadre">Informations Identité</div>
+                    <div><strong>Pièce d'identité :</strong> ${inscrit.cni || '-'}</div>
+                    <div><strong>Type :</strong> ${inscrit.type} ${inscrit.siret ? '(SIRET: ' + inscrit.siret + ')' : ''}</div>
+                </div>
+                <div class="fiche-cadre" style="background-color: #eee;">
+                    <div class="fiche-titre-cadre">Emplacement & Réservation</div>
+                    <div style="font-size: 16px;"><strong>NUMÉRO D'EMPLACEMENT : ${inscrit.emplacement}</strong></div>
+                    <div><strong>Taille réservée :</strong> ${inscrit.metres} mètre(s)</div>
+                    <div><strong>Statut financier :</strong> <strong>${inscrit.statut}</strong> (${inscrit.prixTotal} €)</div>
+                </div>
+                <div class="fiche-cadre">
+                    <div class="fiche-titre-cadre">Décharge de responsabilité</div>
+                    <p style="font-size: 11px; margin: 5px 0;">Je soussigné(e) ${inscrit.nom}, reconnais avoir pris connaissance du règlement de la brocante et m'engage à laisser mon emplacement propre à mon départ. Je certifie sur l'honneur ne pas participer à plus de 2 ventes au déballage dans l'année.</p>
+                    <div class="fiche-signature">
+                        <div><strong>Fait à Montbozon, le ${datePropre}</strong></div>
+                        <div class="fiche-zone-sign">Signature de l'exposant</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function imprimerFicheIndividuelle(id) {
+        const inscrit = inscriptions.find(i => i.id === id);
+        if (!inscrit) return;
+        const datePropre = dateBrocante ? formaterDate(dateBrocante) : `la brocante ${anneeSelectionnee}`;
+        const zoneFiche = document.getElementById('zone-fiche-individuelle');
+        zoneFiche.innerHTML = genererHTMLFiche(inscrit, datePropre);
+        document.body.classList.add('mode-fiche');
+        window.print();
+        setTimeout(() => { document.body.classList.remove('mode-fiche'); zoneFiche.innerHTML = ''; }, 500);
+    }
+
+    function imprimerToutesLesFiches() {
+        if (inscriptions.length === 0) { alert("Aucun exposant à imprimer."); return; }
+        if (!confirm(`Vous allez lancer l'impression de ${inscriptions.length} fiches. Voulez-vous continuer ?`)) return;
+        const datePropre = dateBrocante ? formaterDate(dateBrocante) : `la brocante ${anneeSelectionnee}`;
+        const zoneFiche = document.getElementById('zone-fiche-individuelle');
+        const listeTriee = [...inscriptions].sort((a, b) => (a.emplacement || '').localeCompare(b.emplacement || '', undefined, {numeric: true}));
+        let htmlGlobal = '';
+        listeTriee.forEach(inscrit => { htmlGlobal += genererHTMLFiche(inscrit, datePropre); });
+        zoneFiche.innerHTML = htmlGlobal;
+        document.body.classList.add('mode-fiche');
+        window.print();
+        setTimeout(() => { document.body.classList.remove('mode-fiche'); zoneFiche.innerHTML = ''; }, 500);
+    }
+
+    function reinitialiserAnneeEnCours() {
+        const confirm1 = confirm(`Êtes-vous ABSOLUMENT SÛR de vouloir supprimer TOUS les exposants de l'année ${anneeSelectionnee} ?`);
+        if (confirm1) {
+            const verif = prompt(`Pour valider la suppression, veuillez écrire le mot "EFFACER" :`);
+            if (verif === "EFFACER") {
+                db.ref("annees/" + anneeSelectionnee + "/exposants").remove();
+                db.ref("config/" + anneeSelectionnee).set({ capacite: 500, date: '' });
+                alert(`L'année ${anneeSelectionnee} a bien été remise à zéro !`);
+            } else {
+                alert("Action annulée : le mot écrit est incorrect.");
+            }
+        }
+    }
+
+    function toggleSiret() {
+        const type = document.querySelector('input[name="typeExposant"]:checked').value;
+        const siretGroup = document.getElementById('groupe-siret');
+        siretGroup.style.display = (type === "Professionnel") ? "flex" : "none";
+    }
+
+    function formaterDate(dateIso) {
+        if (!dateIso) return '';
+        const parts = dateIso.split('-');
+        if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        return dateIso;
+    }
+
+    function afficherInscriptions() {
+        const corps = document.getElementById('liste-corps');
+        const recherche = document.getElementById('recherche').value.toLowerCase();
+        const filtreType = document.getElementById('filtre-type').value;
+        const filtreStatut = document.getElementById('filtre-statut').value;
+        const filtreEmail = document.getElementById('filtre-email').value;
+        corps.innerHTML = '';
+        
+        let totalMetres = 0;
+        let totalCaisse = 0;
+        
+        inscriptions.forEach(i => {
+            if(i.statut === "Payé") { totalMetres += i.metres; totalCaisse += i.prixTotal; }
+        });
+
+        const inscritsFiltrés = inscriptions.filter(i => {
+            const nomTxt = (i.nom || '').toLowerCase();
+            const emplTxt = (i.emplacement || '').toLowerCase();
+            const telTxt = (i.telephone || '').toLowerCase();
+            const matchRecherche = nomTxt.includes(recherche) || emplTxt.includes(recherche) || telTxt.includes(recherche);
+            const matchType = (filtreType === "tous") || (i.type === filtreType);
+            const matchStatut = (filtreStatut === "tous") || (i.statut === filtreStatut);
+            let matchEmail = true;
+            if (filtreEmail === "envoye") matchEmail = (i.emailEnvoye === true);
+            else if (filtreEmail === "non-envoye") matchEmail = (i.emailEnvoye !== true);
+            return matchRecherche && matchType && matchStatut && matchEmail;
+        });
+
+        inscritsFiltrés.sort((a, b) => (a.nom || '').toLowerCase().localeCompare((b.nom || '').toLowerCase(), 'fr'));
+
+        inscritsFiltrés.forEach(inscrit => {
+            const classeStatutBadge = inscrit.statut === "Payé" ? "status-paye" : "status-attente";
+            const classeType = inscrit.type === "Particulier" ? "type-particulier" : "type-pro";
+            const classeLigne = inscrit.statut === "Payé" ? "ligne-paye" : "ligne-attente";
+            
+            const dateStr = formaterDate(inscrit.dateCni);
+            const autoriteStr = inscrit.autoriteCni || '';
+            let delivrancePleinTxt = '-';
+            if (dateStr && autoriteStr) delivrancePleinTxt = `${dateStr} (${autoriteStr})`;
+            else if (dateStr) delivrancePleinTxt = dateStr;
+            else if (autoriteStr) delivrancePleinTxt = autoriteStr;
+
+            const classeBoutonEmail = inscrit.emailEnvoye ? "btn-email envoye" : "btn-email";
+
+            const tr = document.createElement('tr');
+            tr.className = classeLigne;
+            tr.innerHTML = `
+                <td><strong>${inscrit.emplacement}</strong></td>
+                <td><span class="type-badge ${classeType}">${inscrit.type}</span></td>
+                <td>${inscrit.nom}</td>
+                <td>${inscrit.telephone || '-'}</td>
+                <td>${inscrit.cni || '-'}</td>
+                <td>${delivrancePleinTxt}</td>
+                <td>${inscrit.siret || '-'}</td>
+                <td>${inscrit.adresse || '-'}</td>
+                <td>${inscrit.metres} m</td>
+                <td>${inscrit.prixTotal} €</td>
+                <td><span class="status-badge ${classeStatutBadge}">${inscrit.statut}</span></td>
+                <td class="actions">
+                    <button class="btn-action btn-status" onclick="changerStatut('${inscrit.id}')" title="Changer le statut">
+                        <svg viewBox="0 0 24 24"><path d="M16 3h5v5"></path><path d="M4 20L21 3"></path><path d="M21 16v5h-5"></path><path d="M15 15l6 6"></path><path d="M4 4l5 5"></path></svg>
+                    </button>
+                    <button class="btn-action btn-fiche" onclick="imprimerFicheIndividuelle('${inscrit.id}')" title="Imprimer fiche A4">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </button>
+                    <button class="btn-action btn-edit" onclick="chargerPourModification('${inscrit.id}')" title="Modifier">
+                        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button class="btn-action ${classeBoutonEmail}" onclick="envoyerEmail('${inscrit.id}')" title="Lui envoyer un e-mail">
+                        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </button>
+                    <button class="btn-action btn-danger" onclick="supprimer('${inscrit.id}')" title="Supprimer">
+                        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                </td>
+            `;
+            corps.appendChild(tr);
+        });
+
+        const restants = capaciteTotale - totalMetres;
+        document.getElementById('stat-total').innerText = inscriptions.length;
+        document.getElementById('stat-metres').innerText = totalMetres;
+        document.getElementById('stat-restants').innerText = restants;
+        document.getElementById('stat-caisse').innerText = totalCaisse;
+
+        const jauge = document.getElementById('jauge');
+        let pourcentage = capaciteTotale > 0 ? Math.round((totalMetres / capaciteTotale) * 100) : 0;
+        jauge.style.width = Math.min(pourcentage, 100) + '%';
+        jauge.innerText = pourcentage + '%';
+        
+        if (pourcentage > 100) { jauge.classList.add('alerte'); jauge.innerText = `Surchargé (${pourcentage}%)`; }
+        else { jauge.classList.remove('alerte'); }
+    }
+
+    function imprimerEtiquettes() {
+        const zone = document.getElementById('zone-etiquettes');
+        zone.innerHTML = '';
+        if (inscriptions.length === 0) { alert("Aucun exposant à imprimer."); return; }
+        const listeTriee = [...inscriptions].sort((a, b) => (a.emplacement || '').localeCompare(b.emplacement || '', undefined, {numeric: true}));
+        listeTriee.forEach(inscrit => {
+            const div = document.createElement('div');
+            div.className = 'etiquette';
+            div.innerHTML = `<div class="etiquette-num">${inscrit.emplacement}</div><div class="etiquette-nom">${inscrit.nom}</div>`;
+            zone.appendChild(div);
+        });
+        document.body.classList.add('mode-etiquettes');
+        window.print();
+        setTimeout(() => { document.body.classList.remove('mode-etiquettes'); }, 500);
+    }
+
+    initialiserSelecteurAnnee();
+    chargerAnnee(anneeSelectionnee);
+</script>
+
+</body>
+</html>
