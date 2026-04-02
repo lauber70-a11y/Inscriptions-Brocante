@@ -106,14 +106,42 @@
         }
         .jauge-barre.alerte { background-color: var(--danger); }
 
+        /* --- STYLES DE LA FENÊTRE MODALE (FORMULAIRE) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px; right: 15px;
+            background: none; border: none;
+            font-size: 28px; cursor: pointer; color: #aaa;
+        }
+        .modal-close:hover { color: var(--danger); }
+
         form {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+            margin-top: 15px;
         }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: 1 / -1; }
@@ -125,13 +153,7 @@
             height: 100%;
             margin-top: 5px;
         }
-        .radio-group label {
-            font-weight: normal;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .radio-group label { font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         
         label { margin-bottom: 5px; font-weight: 600; font-size: 14px; }
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
@@ -153,35 +175,22 @@
             transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .btn-modern svg {
-            width: 18px;
-            height: 18px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        .btn-modern:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
+        .btn-modern svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        
+        .btn-add-exposant { background-color: #27ae60; font-size: 16px; padding: 12px 25px; }
+        .btn-add-exposant:hover { background-color: #219653; }
         
         .btn-print { background-color: #8e44ad; }
         .btn-print:hover { background-color: #732d91; }
-        
         .btn-tags { background-color: #e67e22; }
         .btn-tags:hover { background-color: #d35400; }
-
         .btn-danger-global { background-color: var(--danger); }
         .btn-danger-global:hover { background-color: #c0392b; }
-        
         .btn-rappel-group { background-color: #d35400; }
         .btn-rappel-group:hover { background-color: #b33900; }
-
         .btn-fiches-all { background-color: #16a085; }
         .btn-fiches-all:hover { background-color: #117a65; }
-
         .btn-docs-email { background-color: #2980b9; }
         .btn-docs-email:hover { background-color: #1c638d; }
         
@@ -211,18 +220,14 @@
         
         .btn-status { background-color: var(--primary); }
         .btn-status:hover { background-color: #1a252f; }
-        
         .btn-edit { background-color: var(--info); }
         .btn-edit:hover { background-color: #2980b9; }
-        
         .btn-email { background-color: var(--email-color); }
         .btn-email:hover { background-color: #1c638d; }
         .btn-email.envoye { background-color: var(--email-done); }
         .btn-email.envoye:hover { background-color: #27ae60; }
-        
         .btn-danger { background-color: var(--danger); }
         .btn-danger:hover { background-color: #c0392b; }
-        
         .btn-fiche { background-color: #16a085; }
         .btn-fiche:hover { background-color: #117a65; }
         
@@ -234,12 +239,10 @@
         .type-pro { background-color: var(--pro); }
 
         #groupe-siret { display: none; }
-        
         #titre-impression { display: none; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 10px; }
         #visa-mairie-impression { display: none; text-align: right; font-weight: bold; font-size: 12px; margin-top: 15px; }
 
         #zone-etiquettes, #zone-fiche-individuelle { display: none; }
-
         .ligne-paye { background-color: transparent; }
         .ligne-attente { background-color: #fcf3cf; }
 
@@ -247,7 +250,7 @@
             @page { size: landscape; margin: 0.5cm; }
             html, body { background-color: white; color: black; padding: 0; overflow: visible !important; }
             .container { box-shadow: none; max-width: 100%; padding: 0; }
-            .config-bar, .stats, .jauge-container, h2#titre-formulaire, form, .search-area, .actions-globales, .actions, .header-app { display: none !important; }
+            .config-bar, .stats, .jauge-container, form, .search-area, .actions-globales, .actions, .header-app, .modal-overlay { display: none !important; }
             
             #titre-impression { display: block; }
             #visa-mairie-impression { display: block; }
@@ -260,31 +263,20 @@
             tr { display: table-row !important; }
             th, td { display: table-cell !important; }
             
-            /* REPARTITION PROPORTIONNELLE DES COLONNES */
             thead tr, tbody tr { display: flex !important; width: 100% !important; }
             
-            /* Petites colonnes chiffrées */
-            th:nth-child(1), td:nth-child(1) { order: 1; flex: 0.4; text-align: center !important; } /* Emplacement */
-            th:nth-child(9), td:nth-child(9) { order: 2; flex: 0.4; text-align: center !important; } /* Métrage */
-            th:nth-child(10), td:nth-child(10) { order: 3; flex: 0.4; text-align: center !important; } /* Repas */
-            
-            /* Colonne Type (élargie pour ne plus tronquer "Professionnel") */
+            th:nth-child(1), td:nth-child(1) { order: 1; flex: 0.4; text-align: center !important; } 
+            th:nth-child(9), td:nth-child(9) { order: 2; flex: 0.4; text-align: center !important; } 
+            th:nth-child(10), td:nth-child(10) { order: 3; flex: 0.4; text-align: center !important; } 
             th:nth-child(2), td:nth-child(2) { order: 4; flex: 0.8; text-align: center !important; } 
-            
-            /* Colonnes standards */
-            th:nth-child(3), td:nth-child(3) { order: 5; flex: 1.3; } /* Nom */
-            th:nth-child(4), td:nth-child(4) { order: 6; flex: 1; }   /* Téléphone */
-            th:nth-child(5), td:nth-child(5) { order: 7; flex: 0.9; } /* CNI */
-            th:nth-child(6), td:nth-child(6) { order: 8; flex: 1.2; } /* Délivrance */
-            th:nth-child(7), td:nth-child(7) { order: 9; flex: 1.2; } /* Siret */
-            
-            /* Colonne Adresse (La plus large !) */
+            th:nth-child(3), td:nth-child(3) { order: 5; flex: 1.3; } 
+            th:nth-child(4), td:nth-child(4) { order: 6; flex: 1; }   
+            th:nth-child(5), td:nth-child(5) { order: 7; flex: 0.9; } 
+            th:nth-child(6), td:nth-child(6) { order: 8; flex: 1.2; } 
+            th:nth-child(7), td:nth-child(7) { order: 9; flex: 1.2; } 
             th:nth-child(8), td:nth-child(8) { order: 10; flex: 2.2; } 
-            
-            /* Statut */
             th:nth-child(12), td:nth-child(12) { order: 11; flex: 0.6; text-align: center; } 
             
-            /* Masquage des colonnes superflues */
             th:nth-child(11), td:nth-child(11), th:nth-child(13), td:nth-child(13) { display: none !important; }
             
             .ligne-attente { background-color: #e2e2e2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -300,25 +292,13 @@
             body.mode-fiche #titre-impression, body.mode-fiche #visa-mairie-impression, body.mode-fiche .table-container { display: none !important; }
             body.mode-fiche #zone-fiche-individuelle { display: block !important; }
             
-            .fiche-a4 { 
-                font-size: 13px;
-                line-height: 1.4; 
-                page-break-after: always; 
-                height: 94vh; 
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between; 
-                box-sizing: border-box;
-            }
+            .fiche-a4 { font-size: 13px; line-height: 1.4; page-break-after: always; height: 94vh; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; }
             .fiche-a4:last-child { page-break-after: auto; }
-            
             .fiche-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px; }
             .fiche-header h2 { font-size: 17px; margin: 2px 0; font-weight: bold; }
             .fiche-header h3 { font-size: 14px; margin: 2px 0; }
-            
             .fiche-cadre { border: 1px solid #000; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
             .fiche-titre-cadre { font-weight: bold; text-transform: uppercase; margin-bottom: 5px; text-decoration: underline; font-size: 13px; }
-            
             .fiche-signature { display: flex; justify-content: space-between; margin-top: 20px; }
             .fiche-zone-sign { border: 1px dashed #000; width: 180px; height: 80px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 11px; }
         }
@@ -332,8 +312,7 @@
         <div class="header-droite">
             <div class="archive-selector">
                 <label for="select-annee">📂 Année consultée :</label>
-                <select id="select-annee" onchange="changerAnneeConsultation()" style="padding: 5px; font-weight: bold;">
-                </select>
+                <select id="select-annee" onchange="changerAnneeConsultation()" style="padding: 5px; font-weight: bold;"></select>
             </div>
             <button class="btn-modern btn-danger-global" onclick="reinitialiserAnneeEnCours()">
                 <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -368,98 +347,106 @@
         <div id="jauge" class="jauge-barre">0%</div>
     </div>
 
-    <h2 id="titre-formulaire">Ajouter un Exposant</h2>
-    <form id="form-inscription">
-        <input type="hidden" id="edit-id" value="">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
+        <button class="btn-modern btn-add-exposant" onclick="ouvrirFormulaire()">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Ajouter un Exposant
+        </button>
 
-        <div class="form-group">
-            <label>Type d'exposant</label>
-            <div class="radio-group">
-                <label><input type="radio" name="typeExposant" value="Particulier" checked onchange="toggleSiret()"> Particulier</label>
-                <label><input type="radio" name="typeExposant" value="Professionnel" onchange="toggleSiret()"> Professionnel</label>
-            </div>
-        </div>
-
-        <div class="form-group" id="groupe-siret">
-            <label for="siret">N° SIRET</label>
-            <input type="text" id="siret" placeholder="Ex: 123 456 789 00012">
-        </div>
-
-        <div class="form-group">
-            <label for="nom">Nom / Prénom (ou Raison Soc.)</label>
-            <input type="text" id="nom" placeholder="Ex: Jean Dupont" required>
-        </div>
-        <div class="form-group">
-            <label for="telephone">N° de Téléphone</label>
-            <input type="tel" id="telephone" placeholder="Ex: 06 12 34 56 78">
-        </div>
-        <div class="form-group">
-            <label for="email">Adresse Mail</label>
-            <input type="email" id="email" placeholder="Ex: jean.dupont@email.com">
-        </div>
-        <div class="form-group">
-            <label for="cni">N° Pièce d'Identité (CNI / Pass.)</label>
-            <input type="text" id="cni" placeholder="Ex: 150499...">
-        </div>
-        <div class="form-group">
-            <label for="dateCni">Date de délivrance</label>
-            <input type="date" id="dateCni">
-        </div>
-        <div class="form-group">
-            <label for="autoriteCni">Délivrée par</label>
-            <input type="text" id="autoriteCni" placeholder="Ex: Mairie de Paris">
-        </div>
-        <div class="form-group full-width">
-            <label for="adresse">Adresse Postale complète</label>
-            <input type="text" id="adresse" placeholder="Ex: 12 rue des Fleurs, 75000 Paris">
-        </div>
-        <div class="form-group">
-            <label for="emplacement">N° Emplacement</label>
-            <input type="text" id="emplacement" placeholder="Ex: A12">
-        </div>
-        <div class="form-group">
-            <label for="metres">Métrage (m)</label>
-            <input type="number" id="metres" min="1" placeholder="Ex: 3">
-        </div>
-        <div class="form-group">
-            <label for="repas">Nb Plateaux Repas</label>
-            <input type="number" id="repas" min="0" value="0" placeholder="Ex: 2">
-        </div>
-        <div class="form-group">
-            <label for="statut">Statut</label>
-            <select id="statut">
-                <option value="Payé">Payé</option>
+        <div class="search-area" style="display: flex; gap: 10px; flex: 1; justify-content: flex-end; flex-wrap: wrap;">
+            <input type="text" id="recherche" style="min-width: 250px; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px;" placeholder="Rechercher par nom, emplacement..." oninput="afficherInscriptions()">
+            <select id="filtre-type" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
+                <option value="tous">Tous les types</option>
+                <option value="Particulier">Particuliers</option>
+                <option value="Professionnel">Professionnels</option>
+            </select>
+            <select id="filtre-statut" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
+                <option value="tous">Tous les paiements</option>
+                <option value="Payé">Payés</option>
                 <option value="En attente">En attente</option>
             </select>
+            <select id="filtre-email" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
+                <option value="tous">Tous les e-mails</option>
+                <option value="envoye">E-mails envoyés</option>
+                <option value="non-envoye">À envoyer</option>
+            </select>
         </div>
-        <div class="form-group" style="justify-content: flex-end; align-items: flex-end;">
-            <button type="submit" id="btn-soumettre" class="btn-modern" style="background-color: var(--secondary);">
-                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                <span id="texte-bouton">Inscrire l'exposant</span>
-            </button>
+    </div>
+
+    <div class="modal-overlay" id="modal-form">
+        <div class="modal-content">
+            <button class="modal-close" onclick="fermerFormulaire()">×</button>
+            <h2 id="titre-formulaire">Ajouter un Exposant</h2>
+            
+            <form id="form-inscription">
+                <input type="hidden" id="edit-id" value="">
+
+                <div class="form-group">
+                    <label>Type d'exposant</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="typeExposant" value="Particulier" checked onchange="toggleSiret()"> Particulier</label>
+                        <label><input type="radio" name="typeExposant" value="Professionnel" onchange="toggleSiret()"> Professionnel</label>
+                    </div>
+                </div>
+                <div class="form-group" id="groupe-siret">
+                    <label for="siret">N° SIRET</label>
+                    <input type="text" id="siret" placeholder="Ex: 123 456 789 00012">
+                </div>
+                <div class="form-group">
+                    <label for="nom">Nom / Prénom (ou Raison Soc.)</label>
+                    <input type="text" id="nom" placeholder="Ex: Jean Dupont" required>
+                </div>
+                <div class="form-group">
+                    <label for="telephone">N° de Téléphone</label>
+                    <input type="tel" id="telephone" placeholder="Ex: 06 12 34 56 78">
+                </div>
+                <div class="form-group">
+                    <label for="email">Adresse Mail</label>
+                    <input type="email" id="email" placeholder="Ex: jean.dupont@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="cni">N° Pièce d'Identité (CNI / Pass.)</label>
+                    <input type="text" id="cni" placeholder="Ex: 150499...">
+                </div>
+                <div class="form-group">
+                    <label for="dateCni">Date de délivrance</label>
+                    <input type="date" id="dateCni">
+                </div>
+                <div class="form-group">
+                    <label for="autoriteCni">Délivrée par</label>
+                    <input type="text" id="autoriteCni" placeholder="Ex: Mairie de Paris">
+                </div>
+                <div class="form-group full-width">
+                    <label for="adresse">Adresse Postale complète</label>
+                    <input type="text" id="adresse" placeholder="Ex: 12 rue des Fleurs, 75000 Paris">
+                </div>
+                <div class="form-group">
+                    <label for="emplacement">N° Emplacement</label>
+                    <input type="text" id="emplacement" placeholder="Ex: A12">
+                </div>
+                <div class="form-group">
+                    <label for="metres">Métrage (m)</label>
+                    <input type="number" id="metres" min="1" placeholder="Ex: 3">
+                </div>
+                <div class="form-group">
+                    <label for="repas">Nb Plateaux Repas</label>
+                    <input type="number" id="repas" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="statut">Statut</label>
+                    <select id="statut">
+                        <option value="Payé">Payé</option>
+                        <option value="En attente">En attente</option>
+                    </select>
+                </div>
+                <div class="form-group full-width" style="justify-content: flex-end; align-items: flex-end; margin-top: 10px;">
+                    <button type="submit" id="btn-soumettre" class="btn-modern" style="background-color: var(--secondary);">
+                        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                        <span id="texte-bouton">Inscrire l'exposant</span>
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
-
-    <div class="search-area" style="display: flex; gap: 10px; margin: 20px 0 10px 0; flex-wrap: wrap;">
-        <input type="text" id="recherche" style="flex: 1; min-width: 250px; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px;" placeholder="Rechercher par nom, emplacement, téléphone..." oninput="afficherInscriptions()">
-        
-        <select id="filtre-type" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
-            <option value="tous">Tous les types</option>
-            <option value="Particulier">Particuliers</option>
-            <option value="Professionnel">Professionnels</option>
-        </select>
-
-        <select id="filtre-statut" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
-            <option value="tous">Tous les paiements</option>
-            <option value="Payé">Payés</option>
-            <option value="En attente">En attente</option>
-        </select>
-
-        <select id="filtre-email" style="padding: 12px; border: 1px solid #ccc; border-radius: 5px; background: white;" onchange="afficherInscriptions()">
-            <option value="tous">Tous les e-mails</option>
-            <option value="envoye">E-mails envoyés</option>
-            <option value="non-envoye">À envoyer</option>
-        </select>
     </div>
 
     <div class="actions-globales">
@@ -467,22 +454,18 @@
             <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
             Envoyer Documents (Gmail)
         </button>
-
         <button class="btn-modern btn-rappel-group" onclick="envoyerEmailRappelGroupe()">
             <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             Relancer les impayés (Email)
         </button>
-
         <button class="btn-modern btn-fiches-all" onclick="imprimerToutesLesFiches()">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             Imprimer toutes les fiches (A4)
         </button>
-
         <button class="btn-modern btn-tags" onclick="imprimerEtiquettes()">
             <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
             Imprimer les Étiquettes
         </button>
-        
         <button class="btn-modern btn-print" onclick="window.print()">
             <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             Imprimer la liste filtrée
@@ -513,7 +496,6 @@
     </div>
 
     <div id="visa-mairie-impression">Visa mairie : ____________________</div>
-
     <div id="zone-etiquettes"></div>
     <div id="zone-fiche-individuelle"></div>
 </div>
@@ -546,22 +528,38 @@
     let dateBrocante = '';
     let anneeSelectionnee = localStorage.getItem('brocanteAnneeConsultation') || anneeActuelle;
 
+    function ouvrirFormulaire() {
+        document.getElementById('modal-form').classList.add('active');
+    }
+
+    function fermerFormulaire() {
+        document.getElementById('modal-form').classList.remove('active');
+        document.getElementById('form-inscription').reset();
+        document.getElementById('edit-id').value = '';
+        document.getElementById('titre-formulaire').innerText = "Ajouter un Exposant";
+        document.getElementById('texte-bouton').innerText = "Inscrire l'exposant";
+        document.getElementById('btn-soumettre').style.backgroundColor = 'var(--secondary)';
+        document.getElementById('repas').value = 0;
+        toggleSiret();
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal-form');
+        if (event.target === modal) { fermerFormulaire(); }
+    };
+
     function initialiserSelecteurAnnee() {
         const select = document.getElementById('select-annee');
         select.innerHTML = '';
-        
         db.ref("config").once("value", (snapshot) => {
             let anneesDispo = [anneeActuelle];
             if (snapshot.exists()) {
-                snapshot.forEach((child) => {
-                    if (!anneesDispo.includes(child.key)) anneesDispo.push(child.key);
-                });
+                snapshot.forEach((child) => { if (!anneesDispo.includes(child.key)) anneesDispo.push(child.key); });
             }
             anneesDispo.sort().reverse();
             anneesDispo.forEach(ann => {
                 const option = document.createElement('option');
-                option.value = ann;
-                option.text = ann;
+                option.value = ann; option.text = ann;
                 if (ann === anneeSelectionnee) option.selected = true;
                 select.appendChild(option);
             });
@@ -571,7 +569,6 @@
     function chargerAnnee(annee) {
         db.ref("config/" + anneeSelectionnee).off();
         db.ref("annees/" + anneeSelectionnee + "/exposants").off();
-
         db.ref("config/" + annee).on("value", (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
@@ -579,22 +576,16 @@
                 dateBrocante = data.date || '';
             } else {
                 db.ref("config/" + annee).set({ capacite: 500, date: '' });
-                capaciteTotale = 500;
-                dateBrocante = '';
+                capaciteTotale = 500; dateBrocante = '';
             }
             document.getElementById('capacite-totale').value = capaciteTotale;
             document.getElementById('date-brocante').value = dateBrocante;
             document.getElementById('print-date').innerText = dateBrocante ? formaterDate(dateBrocante) : '...';
             afficherInscriptions();
         });
-
         db.ref("annees/" + annee + "/exposants").on("value", (snapshot) => {
             inscriptions = [];
-            if (snapshot.exists()) {
-                snapshot.forEach((child) => {
-                    inscriptions.push({ id: child.key, ...child.val() });
-                });
-            }
+            if (snapshot.exists()) { snapshot.forEach((child) => { inscriptions.push({ id: child.key, ...child.val() }); }); }
             afficherInscriptions();
         });
     }
@@ -635,40 +626,21 @@
         const statut = document.getElementById('statut').value;
         
         if (emplacement !== '' && emplacement !== '-') {
-            const doublon = inscriptions.find(inscrit => 
-                inscrit.emplacement === emplacement && inscrit.id !== idEnCours
-            );
-            
-            if (doublon) {
-                alert(`⚠️ Impossible : L'emplacement "${emplacement}" est déjà attribué à ${doublon.nom} !`);
-                return;
-            }
+            const doublon = inscriptions.find(inscrit => inscrit.emplacement === emplacement && inscrit.id !== idEnCours);
+            if (doublon) { alert(`⚠️ Impossible : L'emplacement "${emplacement}" est déjà attribué à ${doublon.nom} !`); return; }
         }
-
         const prixTotal = (metres * PRIX_AU_METRE) + (repas * PRIX_REPAS);
-
-        const dataExposant = {
-            type, nom, telephone, email, cni, dateCni, autoriteCni, 
-            siret: (type === "Professionnel" ? siret : ''),
-            adresse, emplacement, metres, repas, statut, prixTotal
-        };
-
+        const dataExposant = { type, nom, telephone, email, cni, dateCni, autoriteCni, siret: (type === "Professionnel" ? siret : ''), adresse, emplacement, metres, repas, statut, prixTotal };
+        
         const refExposants = db.ref("annees/" + anneeSelectionnee + "/exposants");
-
         if (idEnCours) {
             refExposants.child(idEnCours).update(dataExposant);
-            document.getElementById('edit-id').value = '';
-            document.getElementById('titre-formulaire').innerText = "Ajouter un Exposant";
-            document.getElementById('texte-bouton').innerText = "Inscrire l'exposant";
-            document.getElementById('btn-soumettre').style.backgroundColor = 'var(--secondary)';
         } else {
             dataExposant.emailEnvoye = false;
             refExposants.push(dataExposant);
         }
         
-        form.reset();
-        document.getElementById('repas').value = 0;
-        toggleSiret();
+        fermerFormulaire();
     });
 
     function chargerPourModification(id) {
@@ -696,15 +668,11 @@
             document.getElementById('texte-bouton').innerText = "Enregistrer les modifications";
             document.getElementById('btn-soumettre').style.backgroundColor = 'var(--info)';
             
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            ouvrirFormulaire();
         }
     }
 
-    function supprimer(id) {
-        if(confirm("Êtes-vous sûr de vouloir supprimer cette inscription ?")) {
-            db.ref("annees/" + anneeSelectionnee + "/exposants").child(id).remove();
-        }
-    }
+    function supprimer(id) { if(confirm("Êtes-vous sûr de vouloir supprimer cette inscription ?")) { db.ref("annees/" + anneeSelectionnee + "/exposants").child(id).remove(); } }
 
     function changerStatut(id) {
         const inscrit = inscriptions.find(i => i.id === id);
@@ -716,10 +684,7 @@
 
     function envoyerEmail(id) {
         const inscrit = inscriptions.find(i => i.id === id);
-        if (!inscrit || !inscrit.email) {
-            alert("Cet exposant n'a pas d'adresse e-mail renseignée !");
-            return;
-        }
+        if (!inscrit || !inscrit.email) { alert("Cet exposant n'a pas d'adresse e-mail renseignée !"); return; }
         const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
         const sujet = `Confirmation d'inscription - Brocante ${anneeSelectionnee}`;
         const corpsEmail = `Bonjour ${inscrit.nom},\n\nNous vous confirmons votre inscription pour la brocante ${labelBrocante}.\n\nVoici vos informations :\n- Emplacement : ${inscrit.emplacement}\n- Taille : ${inscrit.metres} mètre(s)\n- Plateaux repas : ${inscrit.repas || 0}\n- Statut du règlement : ${inscrit.statut}\n\nCordialement,\nLe Comité d'Organisation`;
@@ -730,78 +695,35 @@
 
     function envoyerEmailRappelGroupe() {
         const dossiersEnAttente = inscriptions.filter(i => i.statut === "En attente" && i.email);
-        if (dossiersEnAttente.length === 0) {
-            alert("Aucun exposant en attente avec une adresse e-mail n'a été trouvé !");
-            return;
-        }
+        if (dossiersEnAttente.length === 0) { alert("Aucun exposant en attente avec une adresse e-mail n'a été trouvé !"); return; }
         const listeEmails = dossiersEnAttente.map(i => i.email).join(',');
         const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
         const sujet = `IMPORTANT : Règlement de votre inscription - Brocante ${anneeSelectionnee}`;
         const corpsEmail = `Bonjour,\n\nNous faisons le point sur les inscriptions pour la brocante ${labelBrocante}.\n\nSauf erreur de notre part, nous n'avons pas encore reçu votre règlement. Merci de nous le faire parvenir dans les plus brefs délais pour valider définitivement votre emplacement.\n\nCordialement,\nLe Comité d'Organisation`;
         const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&bcc=${encodeURIComponent(listeEmails)}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsEmail)}`;
-        if(confirm(`Vous allez ouvrir Gmail pour envoyer un rappel à ${dossiersEnAttente.length} exposant(s). Continuer ?`)) {
-            window.open(urlGmail, '_blank');
-        }
+        if(confirm(`Vous allez ouvrir Gmail pour envoyer un rappel à ${dossiersEnAttente.length} exposant(s). Continuer ?`)) { window.open(urlGmail, '_blank'); }
     }
 
     function envoyerDocumentsLibre() {
         const destinataire = prompt("Veuillez saisir l'adresse e-mail du destinataire :");
-        
-        if (!destinataire || destinataire.trim() === "") {
-            return; 
-        }
-
+        if (!destinataire || destinataire.trim() === "") { return; }
         const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
         const sujet = `Formulaire d'inscription et Règlement - Brocante ${anneeSelectionnee}`;
-        
-        const lienFormulairePdf = "https://drive.google.com/file/d/1VZT-lzByVsxq39Nrbz_2YD4eVzBEpAlg/view?usp=sharing";
-        const lienReglementPdf = "https://drive.google.com/file/d/1mZRgAv-TxfH3HJjukoVnxoiZh5R-HVC8/view?usp=sharing";
         const lienFormulaireEnLigne = "https://lauber70-a11y.github.io/Formulaire-Inscriptions-Brocante/";
+        
+        // VOS DEUX LIENS SONT BIEN INTÉGRÉS ICI :
+        const lienDoc1 = "https://drive.google.com/file/d/1VZT-lzByVsxq39Nrbz_2YD4eVzBEpAlg/view?usp=sharing";
+        const lienDoc2 = "https://drive.google.com/file/d/1mZRgAv-TxfH3HJjukoVnxoiZh5R-HVC8/view?usp=sharing";
 
-        const corpsEmail = `Bonjour,\n\nSuite à notre échange, vous trouverez ci-dessous les informations pour votre inscription concernant la brocante ${labelBrocante}.\n\n🌐 Option 1 : Pré inscription en ligne \nVous pouvez remplir directement votre demande en cliquant sur ce lien :\n${lienFormulaireEnLigne}\n\n📥 Option 2 : Inscription par courrier\nSi vous préférez le format papier, vous pouvez télécharger et imprimer le formulaire ici :\n${lienFormulairePdf}\n\n📜 Règlement de la brocante :\nVous pouvez consulter et télécharger le règlement de l'événement ici :\n${lienReglementPdf}\n\nPour l'option par courrier, merci de nous retourner le formulaire complété accompagné de votre règlement pour valider votre emplacement.\n\nBonne journée,\nLe Comité des Fêtes`;
+        const corpsEmail = `Bonjour,\n\nSuite à notre échange, vous trouverez ci-dessous les informations pour votre inscription concernant la brocante ${labelBrocante}.\n\n🌐 Inscription en ligne (Le plus simple et le plus rapide)\nVous pouvez remplir directement votre demande en cliquant sur ce lien :\n${lienFormulaireEnLigne}\n\n📄 Documents d'information et format papier :\n- Règlement intérieur de la brocante : ${lienDoc1}\n- Formulaire d'inscription à imprimer (si besoin) : ${lienDoc2}\n\nBonne journée,\nLe Comité des Fêtes`;
         
         const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(destinataire.trim())}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsEmail)}`;
-        
         window.open(urlGmail, '_blank');
     }
 
     function genererHTMLFiche(inscrit, datePropre) {
         const nomMajuscule = (inscrit.nom || '').toUpperCase();
-        return `
-            <div class="fiche-a4">
-                <div class="fiche-header">
-                    <h2>FICHE RÉCAPITULATIVE DE L'EXPOSANT : ${nomMajuscule}</h2>
-                    <h3>Brocante du ${datePropre}</h3>
-                </div>
-                <div class="fiche-cadre">
-                    <div class="fiche-titre-cadre">Coordonnées de l'Exposant</div>
-                    <div><strong>Nom / Prénom :</strong> ${inscrit.nom}</div>
-                    <div><strong>Téléphone :</strong> ${inscrit.telephone || '-'}</div>
-                    <div><strong>Email :</strong> ${inscrit.email || '-'}</div>
-                    <div><strong>Adresse :</strong> ${inscrit.adresse || '-'}</div>
-                </div>
-                <div class="fiche-cadre">
-                    <div class="fiche-titre-cadre">Informations Identité</div>
-                    <div><strong>Pièce d'identité :</strong> ${inscrit.cni || '-'}</div>
-                    <div><strong>Type :</strong> ${inscrit.type} ${inscrit.siret ? '(SIRET: ' + inscrit.siret + ')' : ''}</div>
-                </div>
-                <div class="fiche-cadre" style="background-color: #eee;">
-                    <div class="fiche-titre-cadre">Emplacement & Réservation</div>
-                    <div style="font-size: 16px;"><strong>NUMÉRO D'EMPLACEMENT : ${inscrit.emplacement}</strong></div>
-                    <div><strong>Taille réservée :</strong> ${inscrit.metres} mètre(s)</div>
-                    <div><strong>Plateaux repas :</strong> ${inscrit.repas || 0}</div>
-                    <div><strong>Statut financier :</strong> <strong>${inscrit.statut}</strong> (${inscrit.prixTotal} €)</div>
-                </div>
-                <div class="fiche-cadre">
-                    <div class="fiche-titre-cadre">Décharge de responsabilité</div>
-                    <p style="font-size: 11px; margin: 5px 0;">Je soussigné(e) ${inscrit.nom}, reconnais avoir pris connaissance du règlement de la brocante et m'engage à laisser mon emplacement propre à mon départ. Je certifie sur l'honneur ne pas participer à plus de 2 ventes au déballage dans l'année.</p>
-                    <div class="fiche-signature">
-                        <div><strong>Fait à Montbozon, le ${datePropre}</strong></div>
-                        <div class="fiche-zone-sign">Signature de l'exposant</div>
-                    </div>
-                </div>
-            </div>
-        `;
+        return `<div class="fiche-a4"><div class="fiche-header"><h2>FICHE RÉCAPITULATIVE DE L'EXPOSANT : ${nomMajuscule}</h2><h3>Brocante du ${datePropre}</h3></div><div class="fiche-cadre"><div class="fiche-titre-cadre">Coordonnées de l'Exposant</div><div><strong>Nom / Prénom :</strong> ${inscrit.nom}</div><div><strong>Téléphone :</strong> ${inscrit.telephone || '-'}</div><div><strong>Email :</strong> ${inscrit.email || '-'}</div><div><strong>Adresse :</strong> ${inscrit.adresse || '-'}</div></div><div class="fiche-cadre"><div class="fiche-titre-cadre">Informations Identité</div><div><strong>Pièce d'identité :</strong> ${inscrit.cni || '-'}</div><div><strong>Type :</strong> ${inscrit.type} ${inscrit.siret ? '(SIRET: ' + inscrit.siret + ')' : ''}</div></div><div class="fiche-cadre" style="background-color: #eee;"><div class="fiche-titre-cadre">Emplacement & Réservation</div><div style="font-size: 16px;"><strong>NUMÉRO D'EMPLACEMENT : ${inscrit.emplacement}</strong></div><div><strong>Taille réservée :</strong> ${inscrit.metres} mètre(s)</div><div><strong>Plateaux repas :</strong> ${inscrit.repas || 0}</div><div><strong>Statut financier :</strong> <strong>${inscrit.statut}</strong> (${inscrit.prixTotal} €)</div></div><div class="fiche-cadre"><div class="fiche-titre-cadre">Décharge de responsabilité</div><p style="font-size: 11px; margin: 5px 0;">Je soussigné(e) ${inscrit.nom}, reconnais avoir pris connaissance du règlement de la brocante et m'engage à laisser mon emplacement propre à mon départ. Je certifie sur l'honneur ne pas participer à plus de 2 ventes au déballage dans l'année.</p><div class="fiche-signature"><div><strong>Fait à Montbozon, le ${datePropre}</strong></div><div class="fiche-zone-sign">Signature de l'exposant</div></div></div></div>`;
     }
 
     function imprimerFicheIndividuelle(id) {
@@ -837,9 +759,7 @@
                 db.ref("annees/" + anneeSelectionnee + "/exposants").remove();
                 db.ref("config/" + anneeSelectionnee).set({ capacite: 500, date: '' });
                 alert(`L'année ${anneeSelectionnee} a bien été remise à zéro !`);
-            } else {
-                alert("Action annulée : le mot écrit est incorrect.");
-            }
+            } else { alert("Action annulée : le mot écrit est incorrect."); }
         }
     }
 
@@ -864,16 +784,10 @@
         const filtreEmail = document.getElementById('filtre-email').value;
         corps.innerHTML = '';
         
-        let totalMetres = 0;
-        let totalCaisse = 0;
-        let totalRepas = 0;
+        let totalMetres = 0; let totalCaisse = 0; let totalRepas = 0;
         
         inscriptions.forEach(i => {
-            if(i.statut === "Payé") { 
-                totalMetres += i.metres; 
-                totalCaisse += i.prixTotal; 
-                totalRepas += (i.repas || 0);
-            }
+            if(i.statut === "Payé") { totalMetres += i.metres; totalCaisse += i.prixTotal; totalRepas += (i.repas || 0); }
         });
 
         const inscritsFiltrés = inscriptions.filter(i => {
@@ -889,8 +803,7 @@
         });
 
         inscritsFiltrés.sort((a, b) => {
-            const empA = a.emplacement || '';
-            const empB = b.emplacement || '';
+            const empA = a.emplacement || ''; const empB = b.emplacement || '';
             if (empA === '-' || empA === '') return 1;
             if (empB === '-' || empB === '') return -1;
             return empA.localeCompare(empB, undefined, {numeric: true, sensitivity: 'base'});
@@ -900,9 +813,7 @@
             const classeStatutBadge = inscrit.statut === "Payé" ? "status-paye" : "status-attente";
             const classeType = inscrit.type === "Particulier" ? "type-particulier" : "type-pro";
             const classeLigne = inscrit.statut === "Payé" ? "ligne-paye" : "ligne-attente";
-            
-            const dateStr = formaterDate(inscrit.dateCni);
-            const autoriteStr = inscrit.autoriteCni || '';
+            const dateStr = formaterDate(inscrit.dateCni); const autoriteStr = inscrit.autoriteCni || '';
             let delivrancePleinTxt = '-';
             if (dateStr && autoriteStr) delivrancePleinTxt = `${dateStr} (${autoriteStr})`;
             else if (dateStr) delivrancePleinTxt = dateStr;
