@@ -8,7 +8,7 @@
         :root {
             --primary: #2c3e50;
             --secondary: #18bc9c;
-            --light: #ecf0f1;
+            --light: #f5f6fa;
             --dark: #34495e;
             --danger: #e74c3c;
             --warning: #f39c12;
@@ -37,7 +37,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--light);
+            border-bottom: 2px solid #ecf0f1;
             margin-bottom: 15px;
             padding-bottom: 10px;
         }
@@ -51,7 +51,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: var(--light);
+            background: #ecf0f1;
             padding: 8px 15px;
             border-radius: 5px;
             font-weight: bold;
@@ -76,7 +76,7 @@
         .stats {
             display: flex;
             justify-content: space-around;
-            background: var(--light);
+            background: #ecf0f1;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
@@ -181,6 +181,9 @@
 
         .btn-fiches-all { background-color: #16a085; }
         .btn-fiches-all:hover { background-color: #117a65; }
+
+        .btn-docs-email { background-color: #2980b9; }
+        .btn-docs-email:hover { background-color: #1c638d; }
         
         .table-container { overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -261,13 +264,12 @@
             th:nth-child(5), td:nth-child(5) { width: 70px; }
             th:nth-child(6), td:nth-child(6) { width: 90px; }
             th:nth-child(7), td:nth-child(7) { width: 95px; }
+            th:nth-child(8), td:nth-child(8) { width: 180px !important; }
             
-            th:nth-child(8), td:nth-child(8) { width: 210px !important; }
+            th:nth-child(11), td:nth-child(11) { width: 40px; text-align: center; }
+            th:nth-child(12), td:nth-child(12) { width: 45px; text-align: center; }
             
-            th:nth-child(10), td:nth-child(10) { width: 40px; text-align: center; }
-            th:nth-child(11), td:nth-child(11) { width: 45px; text-align: center; }
-            
-            th:nth-child(9), td:nth-child(9), th:nth-child(12), td:nth-child(12) { display: none !important; }
+            th:nth-child(9), td:nth-child(9), th:nth-child(10), td:nth-child(10), th:nth-child(13), td:nth-child(13) { display: none !important; }
             
             .ligne-attente { background-color: #e2e2e2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .status-badge, .type-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; border: none !important; color: black !important; background-color: transparent !important; font-size: 8px !important; padding: 0 !important; }
@@ -342,6 +344,7 @@
         <div>Total Exposants : <span id="stat-total">0</span></div>
         <div>Mètres réservés : <span id="stat-metres">0</span> m</div>
         <div>Mètres restants : <span id="stat-restants">0</span> m</div>
+        <div style="color: #d35400;">🍱 Total Plateaux : <span id="stat-repas">0</span></div>
         <div>Total collecté : <span id="stat-caisse">0</span> €</div>
     </div>
 
@@ -403,6 +406,10 @@
             <input type="number" id="metres" min="1" placeholder="Ex: 3">
         </div>
         <div class="form-group">
+            <label for="repas">Nb Plateaux Repas</label>
+            <input type="number" id="repas" min="0" value="0" placeholder="Ex: 2">
+        </div>
+        <div class="form-group">
             <label for="statut">Statut</label>
             <select id="statut">
                 <option value="Payé">Payé</option>
@@ -440,6 +447,11 @@
     </div>
 
     <div class="actions-globales">
+        <button class="btn-modern btn-docs-email" onclick="envoyerDocumentsLibre()">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Envoyer Documents (Gmail)
+        </button>
+
         <button class="btn-modern btn-rappel-group" onclick="envoyerEmailRappelGroupe()">
             <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             Relancer les impayés (Email)
@@ -474,6 +486,7 @@
                     <th>SIRET</th>
                     <th>Adresse</th>
                     <th>Métrage</th>
+                    <th>Repas</th>
                     <th>Total dû</th>
                     <th>Statut</th>
                     <th class="actions">Actions</th>
@@ -494,13 +507,14 @@
 
 <script>
     const PRIX_AU_METRE = 2; 
+    const PRIX_REPAS = 15;
     const anneeActuelle = new Date().getFullYear().toString();
     
     // ==========================================================
     const firebaseConfig = {
         apiKey: "AIzaSyDk6OPQe7XS5hdtNfJHOriTc00_RWCI4A4",
         authDomain: "inscription-brocante.firebaseapp.com",
-        databaseURL: "https://inscription-brocante-default-rtdb.europe-west1.firebasedatabase.app/", // <-- AJOUTEZ VOTRE LIEN ICI
+        databaseURL: "https://inscription-brocante-default-rtdb.europe-west1.firebasedatabase.app",
         projectId: "inscription-brocante",
         storageBucket: "inscription-brocante.firebasestorage.app",
         messagingSenderId: "836597625276",
@@ -509,7 +523,7 @@
     // ==========================================================
 
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database(); // <-- Maintenant on pointe sur la base Realtime
+    const db = firebase.database();
 
     let inscriptions = [];
     let capaciteTotale = 500;
@@ -539,7 +553,6 @@
     }
 
     function chargerAnnee(annee) {
-        // Déconnexion des écouteurs précédents
         db.ref("config/" + anneeSelectionnee).off();
         db.ref("annees/" + anneeSelectionnee + "/exposants").off();
 
@@ -602,6 +615,7 @@
         const adresse = document.getElementById('adresse').value;
         const emplacement = document.getElementById('emplacement').value || '-';
         const metres = parseInt(document.getElementById('metres').value) || 0;
+        const repas = parseInt(document.getElementById('repas').value) || 0;
         const statut = document.getElementById('statut').value;
         
         if (emplacement !== '' && emplacement !== '-') {
@@ -615,10 +629,12 @@
             }
         }
 
+        const prixTotal = (metres * PRIX_AU_METRE) + (repas * PRIX_REPAS);
+
         const dataExposant = {
             type, nom, telephone, email, cni, dateCni, autoriteCni, 
             siret: (type === "Professionnel" ? siret : ''),
-            adresse, emplacement, metres, statut, prixTotal: metres * PRIX_AU_METRE
+            adresse, emplacement, metres, repas, statut, prixTotal
         };
 
         const refExposants = db.ref("annees/" + anneeSelectionnee + "/exposants");
@@ -635,6 +651,7 @@
         }
         
         form.reset();
+        document.getElementById('repas').value = 0;
         toggleSiret();
     });
 
@@ -656,6 +673,7 @@
             document.getElementById('adresse').value = inscrit.adresse || '';
             document.getElementById('emplacement').value = inscrit.emplacement === '-' ? '' : inscrit.emplacement;
             document.getElementById('metres').value = inscrit.metres === 0 ? '' : inscrit.metres;
+            document.getElementById('repas').value = inscrit.repas || 0;
             document.getElementById('statut').value = inscrit.statut;
 
             document.getElementById('titre-formulaire').innerText = `Modifier l'inscription de ${inscrit.nom}`;
@@ -688,7 +706,7 @@
         }
         const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
         const sujet = `Confirmation d'inscription - Brocante ${anneeSelectionnee}`;
-        const corpsEmail = `Bonjour ${inscrit.nom},\n\nNous vous confirmons votre inscription pour la brocante ${labelBrocante}.\n\nVoici vos informations :\n- Emplacement : ${inscrit.emplacement}\n- Taille : ${inscrit.metres} mètre(s)\n- Statut du règlement : ${inscrit.statut}\n\nCordialement,\nLe Comité d'Organisation`;
+        const corpsEmail = `Bonjour ${inscrit.nom},\n\nNous vous confirmons votre inscription pour la brocante ${labelBrocante}.\n\nVoici vos informations :\n- Emplacement : ${inscrit.emplacement}\n- Taille : ${inscrit.metres} mètre(s)\n- Plateaux repas : ${inscrit.repas || 0}\n- Statut du règlement : ${inscrit.statut}\n\nCordialement,\nLe Comité d'Organisation`;
         const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(inscrit.email)}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsEmail)}`;
         window.open(urlGmail, '_blank');
         db.ref("annees/" + anneeSelectionnee + "/exposants").child(id).update({ emailEnvoye: true });
@@ -708,6 +726,32 @@
         if(confirm(`Vous allez ouvrir Gmail pour envoyer un rappel à ${dossiersEnAttente.length} exposant(s). Continuer ?`)) {
             window.open(urlGmail, '_blank');
         }
+    }
+
+    // FONCTION MISE À JOUR AVEC LE LIEN EN LIGNE
+    function envoyerDocumentsLibre() {
+        const destinataire = prompt("Veuillez saisir l'adresse e-mail du destinataire :");
+        
+        // Si l'utilisateur clique sur Annuler ou laisse vide
+        if (!destinataire || destinataire.trim() === "") {
+            return; 
+        }
+
+        const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
+        const sujet = `Formulaire d'inscription et Règlement - Brocante ${anneeSelectionnee}`;
+        
+        // ⚠️ REMPLACEZ LES LIENS CI-DESSOUS PAR VOS LIENS GOOGLE DRIVE PDF
+        const lienFormulairePdf = "https://drive.google.com/file/d/1VZT-lzByVsxq39Nrbz_2YD4eVzBEpAlg/view?usp=sharing";
+        const lienReglementPdf = "https://drive.google.com/file/d/1mZRgAv-TxfH3HJjukoVnxoiZh5R-HVC8/view?usp=sharing";
+        
+        // Votre lien pour l'inscription en ligne
+        const lienFormulaireEnLigne = "https://lauber70-a11y.github.io/Formulaire-Inscriptions-Brocante/";
+
+        const corpsEmail = `Bonjour,\n\nSuite à notre échange, vous trouverez ci-dessous les informations pour votre inscription concernant la brocante ${labelBrocante}.\n\n🌐 Option 1 : Inscription en ligne (Le plus rapide)\nVous pouvez remplir directement votre demande en cliquant sur ce lien :\n${lienFormulaireEnLigne}\n\n📥 Option 2 : Inscription par courrier\nSi vous préférez le format papier, vous pouvez télécharger et imprimer le formulaire ici :\n${lienFormulairePdf}\n\n📜 Règlement de la brocante :\nVous pouvez consulter et télécharger le règlement de l'événement ici :\n${lienReglementPdf}\n\nPour l'option par courrier, merci de nous retourner le formulaire complété accompagné de votre règlement pour valider votre emplacement.\n\nBonne journée,\nLe Comité des Fêtes`;
+        
+        const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(destinataire.trim())}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsEmail)}`;
+        
+        window.open(urlGmail, '_blank');
     }
 
     function genererHTMLFiche(inscrit, datePropre) {
@@ -734,6 +778,7 @@
                     <div class="fiche-titre-cadre">Emplacement & Réservation</div>
                     <div style="font-size: 16px;"><strong>NUMÉRO D'EMPLACEMENT : ${inscrit.emplacement}</strong></div>
                     <div><strong>Taille réservée :</strong> ${inscrit.metres} mètre(s)</div>
+                    <div><strong>Plateaux repas :</strong> ${inscrit.repas || 0}</div>
                     <div><strong>Statut financier :</strong> <strong>${inscrit.statut}</strong> (${inscrit.prixTotal} €)</div>
                 </div>
                 <div class="fiche-cadre">
@@ -810,16 +855,20 @@
         
         let totalMetres = 0;
         let totalCaisse = 0;
+        let totalRepas = 0;
         
         inscriptions.forEach(i => {
-            if(i.statut === "Payé") { totalMetres += i.metres; totalCaisse += i.prixTotal; }
+            if(i.statut === "Payé") { 
+                totalMetres += i.metres; 
+                totalCaisse += i.prixTotal; 
+                totalRepas += (i.repas || 0);
+            }
         });
 
         const inscritsFiltrés = inscriptions.filter(i => {
             const nomTxt = (i.nom || '').toLowerCase();
             const emplTxt = (i.emplacement || '').toLowerCase();
-            const telTxt = (i.telephone || '').toLowerCase();
-            const matchRecherche = nomTxt.includes(recherche) || emplTxt.includes(recherche) || telTxt.includes(recherche);
+            const matchRecherche = nomTxt.includes(recherche) || emplTxt.includes(recherche);
             const matchType = (filtreType === "tous") || (i.type === filtreType);
             const matchStatut = (filtreStatut === "tous") || (i.statut === filtreStatut);
             let matchEmail = true;
@@ -828,7 +877,13 @@
             return matchRecherche && matchType && matchStatut && matchEmail;
         });
 
-        inscritsFiltrés.sort((a, b) => (a.nom || '').toLowerCase().localeCompare((b.nom || '').toLowerCase(), 'fr'));
+        inscritsFiltrés.sort((a, b) => {
+            const empA = a.emplacement || '';
+            const empB = b.emplacement || '';
+            if (empA === '-' || empA === '') return 1;
+            if (empB === '-' || empB === '') return -1;
+            return empA.localeCompare(empB, undefined, {numeric: true, sensitivity: 'base'});
+        });
 
         inscritsFiltrés.forEach(inscrit => {
             const classeStatutBadge = inscrit.statut === "Payé" ? "status-paye" : "status-attente";
@@ -856,6 +911,7 @@
                 <td>${inscrit.siret || '-'}</td>
                 <td>${inscrit.adresse || '-'}</td>
                 <td>${inscrit.metres} m</td>
+                <td><strong>${inscrit.repas || 0}</strong></td>
                 <td>${inscrit.prixTotal} €</td>
                 <td><span class="status-badge ${classeStatutBadge}">${inscrit.statut}</span></td>
                 <td class="actions">
@@ -883,6 +939,7 @@
         document.getElementById('stat-total').innerText = inscriptions.length;
         document.getElementById('stat-metres').innerText = totalMetres;
         document.getElementById('stat-restants').innerText = restants;
+        document.getElementById('stat-repas').innerText = totalRepas;
         document.getElementById('stat-caisse').innerText = totalCaisse;
 
         const jauge = document.getElementById('jauge');
