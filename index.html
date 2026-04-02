@@ -257,19 +257,28 @@
             th, td { padding: 4px; border: 1px solid #000 !important; overflow: hidden; }
             th { background-color: #eee !important; color: black !important; }
             
-            th:nth-child(1), td:nth-child(1) { width: 30px !important; text-align: center !important; }
-            th:nth-child(2), td:nth-child(2) { width: 30px !important; text-align: center !important; }
-            th:nth-child(3), td:nth-child(3) { width: 110px; }
-            th:nth-child(4), td:nth-child(4) { width: 75px; }
-            th:nth-child(5), td:nth-child(5) { width: 70px; }
-            th:nth-child(6), td:nth-child(6) { width: 90px; }
-            th:nth-child(7), td:nth-child(7) { width: 95px; }
-            th:nth-child(8), td:nth-child(8) { width: 180px !important; }
+            /* 1. On force l'affichage en tableau classique pour manipuler les colonnes */
+            tr { display: table-row !important; }
+            th, td { display: table-cell !important; }
             
-            th:nth-child(11), td:nth-child(11) { width: 40px; text-align: center; }
-            th:nth-child(12), td:nth-child(12) { width: 45px; text-align: center; }
+            /* 2. On réorganise visuellement l'ordre des colonnes grâce à Flexbox/Order */
+            th:nth-child(1), td:nth-child(1) { order: 1; width: 30px !important; text-align: center !important; } /* Emplacement */
+            th:nth-child(9), td:nth-child(9) { order: 2; width: 30px !important; text-align: center !important; } /* Métrage */
+            th:nth-child(10), td:nth-child(10) { order: 3; width: 30px !important; text-align: center !important; display: table-cell !important; } /* Repas (Placé en 3e) */
+            th:nth-child(2), td:nth-child(2) { order: 4; width: 30px !important; text-align: center !important; } /* Type */
+            th:nth-child(3), td:nth-child(3) { order: 5; width: 100px; } /* Nom */
+            th:nth-child(4), td:nth-child(4) { order: 6; width: 70px; }  /* Téléphone */
+            th:nth-child(5), td:nth-child(5) { order: 7; width: 65px; }  /* CNI */
+            th:nth-child(6), td:nth-child(6) { order: 8; width: 85px; }  /* Délivrance */
+            th:nth-child(7), td:nth-child(7) { order: 9; width: 90px; }  /* Siret */
+            th:nth-child(8), td:nth-child(8) { order: 10; width: 130px !important; } /* Adresse (Réduite pour faire de la place) */
+            th:nth-child(12), td:nth-child(12) { order: 11; width: 45px; text-align: center; } /* Statut */
             
-            th:nth-child(9), td:nth-child(9), th:nth-child(10), td:nth-child(10), th:nth-child(13), td:nth-child(13) { display: none !important; }
+            /* Pour que la propriété 'order' fonctionne, les lignes du tableau doivent agir comme des conteneurs flex */
+            thead tr, tbody tr { display: flex !important; }
+            
+            /* On masque uniquement les colonnes Total dû et Actions */
+            th:nth-child(11), td:nth-child(11), th:nth-child(13), td:nth-child(13) { display: none !important; }
             
             .ligne-attente { background-color: #e2e2e2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .status-badge, .type-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; border: none !important; color: black !important; background-color: transparent !important; font-size: 8px !important; padding: 0 !important; }
@@ -728,11 +737,9 @@
         }
     }
 
-    // FONCTION MISE À JOUR AVEC LE LIEN EN LIGNE
     function envoyerDocumentsLibre() {
         const destinataire = prompt("Veuillez saisir l'adresse e-mail du destinataire :");
         
-        // Si l'utilisateur clique sur Annuler ou laisse vide
         if (!destinataire || destinataire.trim() === "") {
             return; 
         }
@@ -740,14 +747,11 @@
         const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
         const sujet = `Formulaire d'inscription et Règlement - Brocante ${anneeSelectionnee}`;
         
-        // ⚠️ REMPLACEZ LES LIENS CI-DESSOUS PAR VOS LIENS GOOGLE DRIVE PDF
         const lienFormulairePdf = "https://drive.google.com/file/d/1VZT-lzByVsxq39Nrbz_2YD4eVzBEpAlg/view?usp=sharing";
         const lienReglementPdf = "https://drive.google.com/file/d/1mZRgAv-TxfH3HJjukoVnxoiZh5R-HVC8/view?usp=sharing";
-        
-        // Votre lien pour l'inscription en ligne
         const lienFormulaireEnLigne = "https://lauber70-a11y.github.io/Formulaire-Inscriptions-Brocante/";
 
-        const corpsEmail = `Bonjour,\n\nSuite à notre échange, vous trouverez ci-dessous les informations pour votre inscription concernant la brocante ${labelBrocante}.\n\n🌐 Option 1 :Pré inscription en ligne \nVous pouvez remplir directement votre demande en cliquant sur ce lien :\n${lienFormulaireEnLigne}\n\n📥 Option 2 : Inscription par courrier\nSi vous préférez le format papier, vous pouvez télécharger et imprimer le formulaire ici :\n${lienFormulairePdf}\n\n📜 Règlement de la brocante :\nVous pouvez consulter et télécharger le règlement de l'événement ici :\n${lienReglementPdf}\n\nPour l'option par courrier, merci de nous retourner le formulaire complété accompagné de votre règlement pour valider votre emplacement.\n\nBonne journée,\nLe Comité des Fêtes`;
+        const corpsEmail = `Bonjour,\n\nSuite à notre échange, vous trouverez ci-dessous les informations pour votre inscription concernant la brocante ${labelBrocante}.\n\n🌐 Option 1 : Pré inscription en ligne \nVous pouvez remplir directement votre demande en cliquant sur ce lien :\n${lienFormulaireEnLigne}\n\n📥 Option 2 : Inscription par courrier\nSi vous préférez le format papier, vous pouvez télécharger et imprimer le formulaire ici :\n${lienFormulairePdf}\n\n📜 Règlement de la brocante :\nVous pouvez consulter et télécharger le règlement de l'événement ici :\n${lienReglementPdf}\n\nPour l'option par courrier, merci de nous retourner le formulaire complété accompagné de votre règlement pour valider votre emplacement.\n\nBonne journée,\nLe Comité des Fêtes`;
         
         const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(destinataire.trim())}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsEmail)}`;
         
