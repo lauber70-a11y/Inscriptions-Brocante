@@ -106,7 +106,6 @@
         }
         .jauge-barre.alerte { background-color: var(--danger); }
 
-        /* --- STYLES DE LA FENÊTRE MODALE (FORMULAIRE) --- */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -250,7 +249,8 @@
             @page { size: landscape; margin: 0.5cm; }
             html, body { background-color: white; color: black; padding: 0; overflow: visible !important; }
             .container { box-shadow: none; max-width: 100%; padding: 0; }
-            /* AJOUT DU BOUTON AJOUTER DANS LES ÉLÉMENTS MASQUÉS À L'IMPRESSION */
+            
+            /* ICI : AJOUT DU BOUTON AJOUTER AUX ÉLÉMENTS MASQUÉS À L'IMPRESSION */
             .config-bar, .stats, .jauge-container, form, .search-area, .actions-globales, .actions, .header-app, .modal-overlay, .btn-add-exposant { display: none !important; }
             
             #titre-impression { display: block; }
@@ -510,6 +510,7 @@
     const anneeActuelle = new Date().getFullYear().toString();
     
     // ==========================================================
+    // INSEREZ VOS IDENTIFIANTS CI-DESSOUS POUR QUE CA FONCTIONNE
     const firebaseConfig = {
        apiKey: "AIzaSyDk6OPQe7XS5hdtNfJHOriTc00_RWCI4A4",
        authDomain: "inscription-brocante.firebaseapp.com",
@@ -711,13 +712,9 @@
         const labelBrocante = dateBrocante ? `du ${formaterDate(dateBrocante)}` : anneeSelectionnee;
         const sujet = `Formulaire d'inscription et Règlement - Brocante ${anneeSelectionnee}`;
         const lienFormulaireEnLigne = "https://lauber70-a11y.github.io/Formulaire-Inscriptions-Brocante/";
-        
-        // INVERSION EFFECTUÉE ICI :
-        const lienFormulairePapier = "https://drive.google.com/file/d/1VZT-lzByVsxq39Nrbz_2YD4eVzBEpAlg/view?usp=sharing";
         const lienReglement = "https://drive.google.com/file/d/1mZRgAv-TxfH3HJjukoVnxoiZh5R-HVC8/view?usp=sharing";
-
-        const corpsEmail = `Bonjour,\n\nSuite à notre échange, vous trouverez ci-dessous les informations pour votre inscription concernant la brocante ${labelBrocante}.\n\n🌐 Inscription en ligne (Le plus simple et le plus rapide)\nVous pouvez remplir directement votre demande en cliquant sur ce lien :\n${lienFormulaireEnLigne}\n\n📄 Documents d'information et format papier :\n- Formulaire d'inscription à imprimer (si besoin) : ${lienFormulairePapier}\n- Règlement intérieur de la brocante : ${lienReglement}\n\nBonne journée,\nLe Comité des Fêtes`;
-        
+        const lienFormulairePapier = "https://drive.google.com/file/d/1VZT-lzByVsxq39Nrbz_2YD4eVzBEpAlg/view?usp=sharing";
+        const corpsEmail = `Bonjour,\n\nSuite à notre échange, vous trouverez ci-dessous les informations pour votre inscription concernant la brocante ${labelBrocante}.\n\n🌐 Inscription en ligne (Le plus simple et le plus rapide)\nVous pouvez remplir directement votre demande en cliquant sur ce lien :\n${lienFormulaireEnLigne}\n\n📄 Documents d'information et format papier :\n- Règlement intérieur de la brocante : ${lienReglement}\n- Formulaire d'inscription à imprimer (si besoin) : ${lienFormulairePapier}\n\nBonne journée,\nLe Comité des Fêtes`;
         const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(destinataire.trim())}&su=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsEmail)}`;
         window.open(urlGmail, '_blank');
     }
@@ -729,7 +726,7 @@
 
     function imprimerFicheIndividuelle(id) {
         const inscrit = inscriptions.find(i => i.id === id);
-        if (!const inscrit) return;
+        if (!inscrit) return;
         const datePropre = dateBrocante ? formaterDate(dateBrocante) : `la brocante ${anneeSelectionnee}`;
         const zoneFiche = document.getElementById('zone-fiche-individuelle');
         zoneFiche.innerHTML = genererHTMLFiche(inscrit, datePropre);
